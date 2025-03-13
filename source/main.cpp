@@ -291,6 +291,7 @@ class Sonic {
       }
 
     void sonicSpriteMove(int camX, int camY){
+        // Magic numbers (-18, -12) are for sprite positioning, TOFIX: Scroll issue
       NF_MoveSprite(0, 1, FloatX - camX - 18, FloatY - camY - 12);
       if (Direction == 1) {
         NF_HflipSprite(0, 1, false);
@@ -420,16 +421,10 @@ int main(int argc, char **argv)
       uint16_t keys_held = keysHeld();
       uint16_t keys_down = keysDown();
 
-      sonic.sonicUpdate(keys_held, keys_down);
-      sonic.sonicClamp();
-      sonic.sonicDirection(keys_held);
-      sonic.sonicSpriteMove(camX, camY);
-      sonic.sonicSpriteAnim();
-      sonic.sonicSensor();
-
       // Calculate the target camera position
+      // TOFIX: Scroll issue
       int targetCamX = sonic.FloatX - 128;
-      int targetCamY = sonic.FloatY - 96 + 32;
+      int targetCamY = sonic.FloatY - 96 + 32 // +32 is for sprite positioning;
 
       // Prevent the camera from moving out of bounds
       if (targetCamX < 0) targetCamX = 0;
@@ -441,10 +436,17 @@ int main(int argc, char **argv)
       camX = targetCamX;
       camY = targetCamY;
 
+      sonic.sonicUpdate(keys_held, keys_down);
+      sonic.sonicClamp();
+      sonic.sonicDirection(keys_held);
+      sonic.sonicSpriteMove(camX, camY);
+      sonic.sonicSpriteAnim();
+      sonic.sonicSensor();
+
+
       // Apply scrolling to the background layer
-      // NF_ScrollBg(0, 2, camX, camY-40);
-      BG_SCROLL[2].x = camX;
-      BG_SCROLL[2].y = camY;
+      // TOFIX: Scroll Issue
+      NF_ScrollBg(0, 2, camX, camY-40); // -40 magic number changes as Sonic gets away from the middle of the stage(?)
 
 
       consoleClear();
